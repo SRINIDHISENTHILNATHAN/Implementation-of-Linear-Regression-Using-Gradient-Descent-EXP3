@@ -21,59 +21,59 @@ RegisterNumber:  212222230148
 ```
 import numpy as np
 import pandas as pd
-from sklearn.datasets import fetch_california_housing
-from sklearn.linear_model import SGDRegressor
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
+def linear_regression(X1,y,learning_rate=0.01,num_iters=1000):
+    X=np.c_[np.ones(len(X1)),X1]
+    theta=np.zeros(X.shape[1]).reshape(-1,1)
+    for _ in range(num_iters):
+        predictions=(X).dot(theta).reshape(-1,1)
+        errors=(predictions-y).reshape(-1,1)
+        theta-=learning_rate*(1/len(X1))*X.T.dot(errors)
+    return theta
+data=pd.read_csv("50_Startups.csv",header=None)
+data.head()
 ```
 ```
-data=fetch_california_housing()
-df=pd.DataFrame(data.data,columns=data.feature_names)
-df['target']=data.target
-print(df.head())
+X=(data.iloc[1:,:-2].values)
+print(X)
 ```
 ```
-X=data.data[:,:3]
-
-Y=np.column_stack((data.target,data.data[:,6]))
-
-X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.2,random_state=42)
-scaler_X=StandardScaler()
-scaler_Y=StandardScaler()
-
-X_train=scaler_X.fit_transform(X_train)
-X_test=scaler_X.transform(X_test)
-Y_train=scaler_Y.fit_transform(Y_train)
-Y_test=scaler_Y.transform(Y_test)
-
-sgd=SGDRegressor(max_iter=1000,tol=1e-3)
-
-multi_output_sgd=MultiOutputRegressor(sgd)
-
-multi_output_sgd.fit(X_train,Y_train)
+X1=X.astype(float)
+scaler=StandardScaler()
+y=(data.iloc[1:,-1].values).reshape(-1,1)
+print(y)
+X1_scaled=scaler.fit_transform(X1)
+Y1_scaled=scaler.fit_transform(y)
+print(X1_scaled)
+print(Y1_scaled)
 ```
 ```
-Y_pred=multi_output_sgd.predict(X_test)
-
-Y_pred=scaler_Y.inverse_transform(Y_pred)
-Y_test=scaler_Y.inverse_transform(Y_test)
-
-mse=mean_squared_error(Y_test,Y_pred)
-print("Mean Squared Error :",mse)
+theta=linear_regression(X1_scaled,Y1_scaled)
 ```
 ```
-print("\nPredictions:\n",Y_pred[:5])
+new_data=np.array([165349.2,136897.8,471784.1]).reshape(-1,1)
+new_scaled=scaler.fit_transform(new_data)
+prediction=np.dot(np.append(1,new_scaled),theta)
+prediction=prediction.reshape(-1,1)
+pre=scaler.inverse_transform(prediction)
+print(f"predicted values:{pre}")
 ```
-## Output:
-![image](https://github.com/user-attachments/assets/7eb6adb5-a2fe-4600-866c-af713bead987)
+## Output
+### Head
+![image](https://github.com/user-attachments/assets/404e59f4-7c17-4659-94e4-6bdecff09640)
+### X Data
+![image](https://github.com/user-attachments/assets/ee77f167-4800-4575-a353-114868356425)
+### Y Data
+![image](https://github.com/user-attachments/assets/87c2e744-ccd3-41c9-911a-1842b16f4c93)
+### X1_scaled
+![image](https://github.com/user-attachments/assets/4e6c3aad-3b6b-4159-b4af-e1763476179f)
+### Y1_scaled
+![image](https://github.com/user-attachments/assets/310052f1-54dc-4cc6-bbdb-c4ae6cce3f8f)
+### predicted output
+![image](https://github.com/user-attachments/assets/85810f99-58f0-4120-aa83-39e0e25e258d)
 
-![image](https://github.com/user-attachments/assets/d7dd39a4-44b0-4e9f-b2a6-888a0a72daf7)
 
-![image](https://github.com/user-attachments/assets/7dc0504b-884d-43fb-98c4-594573f2ae9a)
 
-![image](https://github.com/user-attachments/assets/614f184b-1194-4808-861b-1243e2dd9ac5)
 
 
 ## Result:
